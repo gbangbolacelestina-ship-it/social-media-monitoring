@@ -1,0 +1,492 @@
+{
+  "createdAt": "2025-09-19T18:36:22.649Z",
+  "updatedAt": "2025-10-02T15:47:47.000Z",
+  "id": "ac2hZYM4WIDBR19q",
+  "name": "social media & news monitoring system",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -288,
+        -112
+      ],
+      "id": "4bbb78b7-83fb-4545-8c10-92e005a2f4ab",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://google.serper.dev/news",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "f64ee66c1adfce35697937247d4f8e749896db1f"
+            },
+            {
+              "name": "f64ee66c1adfce35697937247d4f8e749896db1f",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"q\": \"AI OR Microsoft OR scam OR fraud OR excellent OR amazing\",\n  \"tbs\": \"qdr:d\"\n}\n\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -64,
+        -112
+      ],
+      "id": "31866ed6-ecb6-4530-af1e-8d6e5e1294dc",
+      "name": "HTTP Request for Google News (AI/Microsoft)"
+    },
+    {
+      "parameters": {
+        "chatId": "5261601959",
+        "text": "=Sentiment: {{ $json.sentiment }}\nTitle: {{$json[\"title\"]}} \nLink: {{$json[\"link\"]}}\nDate: {{ $json.date }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        608,
+        -112
+      ],
+      "id": "d49447ee-e3e8-4209-b3c9-c571be43b2a4",
+      "name": "Send Negative Alert to Telegram",
+      "webhookId": "419d123d-2f78-4ff0-af72-22e042f85632",
+      "credentials": {
+        "telegramApi": {
+          "id": "LGoKG13WSEEjRdKB",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "apphKJsEGPuaKMZXy",
+          "mode": "list",
+          "cachedResultName": "Sentiments",
+          "cachedResultUrl": "https://airtable.com/apphKJsEGPuaKMZXy"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl8J7GCtcYByK3PB",
+          "mode": "list",
+          "cachedResultName": "Positive Sentiment",
+          "cachedResultUrl": "https://airtable.com/apphKJsEGPuaKMZXy/tbl8J7GCtcYByK3PB"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Title": "={{ $json.title }}",
+            "Snippet": "={{ $json.snippet }}",
+            "Link": "={{ $json.link }}",
+            "Sentiment": "={{ $json.sentiment }}",
+            "Date": "={{ $json.date }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Title",
+              "displayName": "Title",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Snippet",
+              "displayName": "Snippet",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Link",
+              "displayName": "Link",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Sentiment",
+              "displayName": "Sentiment",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        592,
+        80
+      ],
+      "id": "e722575c-893a-460a-8ee7-a9a02ba1bd9b",
+      "name": "Send Positive Alert to Telegram",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "o3wumYS0gecx1ZxQ",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "13CTcvD-nuNJ4l_SJxg6zLP7Wfc_abXUNHnf8UKG8xLc",
+          "mode": "list",
+          "cachedResultName": "Crypto ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/13CTcvD-nuNJ4l_SJxg6zLP7Wfc_abXUNHnf8UKG8xLc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2069257028,
+          "mode": "list",
+          "cachedResultName": "Sheet4",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/13CTcvD-nuNJ4l_SJxg6zLP7Wfc_abXUNHnf8UKG8xLc/edit#gid=2069257028"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date": "={{ $json.date }}",
+            "Title": "={{ $json.title }}",
+            "Snippet": "={{ $json.snippet }}",
+            "Link": "={{ $json.link }}",
+            "Sentiment": "={{ $json.sentiment }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Title",
+              "displayName": "Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Snippet",
+              "displayName": "Snippet",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Link",
+              "displayName": "Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Sentiment",
+              "displayName": "Sentiment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        384,
+        -208
+      ],
+      "id": "eba3cb35-1eec-4b68-9930-a8c929ebc187",
+      "name": "Log All to Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Wa0ELh4ZHJnrEJAn",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// === CONFIGURE YOUR KEYWORDS HERE ===\n// Negative sentiment keywords\nconst negative = [\n  \"scam\", \"bad\", \"issue\", \"fraud\", \"broken\",\n  \"battery drain\", \"overheating\", \"problem\", \"fail\",\n  \"bug\", \"error\", \"crash\", \"slow\", \"poor\",\n  \"hate\", \"terrible\", \"worst\", \"disappointing\",\n  \"security flaw\", \"lawsuit\", \"vulnerability\",\n  \"expensive\", \"overpriced\", \"useless\", \"garbage\"\n];\n\n// Positive sentiment keywords\nconst positive = [\n  \"amazing\", \"great\", \"excellent\", \"love\", \"best\",\n  \"fast\", \"smooth\", \"impressive\", \"fantastic\", \"wonderful\",\n  \"powerful\", \"innovative\", \"brilliant\", \"awesome\",\n  \"superb\", \"outstanding\", \"perfect\", \"cool\",\n  \"helpful\", \"reliable\", \"trusted\", \"favorite\",\n  \"easy\", \"affordable\", \"top-notch\", \"game changer\"\n];\n\n\n// === helper to normalize text ===\nfunction normalize(s){ return (s || \"\").toString().toLowerCase(); }\n\n// === find the source array of articles ===\nlet articles = [];\n\n// Case A: single item with .json.news array (typical serper.dev response)\nif (items.length === 1 && Array.isArray(items[0].json.news)) {\n  articles = items[0].json.news;\n} else {\n  // Case B: each incoming item is already an article (title/snippet present)\n  articles = items.map(it => it.json);\n}\n\n// If no articles, return empty array (prevents errors)\nif (!Array.isArray(articles) || articles.length === 0) {\n  return [];\n}\n\n// Map each article to an n8n item with sentiment and fields we'll need later\nconst output = articles.map(article => {\n  const title = article.title || article.headline || \"\";\n  const snippet = article.snippet || article.description || article.excerpt || \"\";\n  const link = article.link || article.url || \"\";\n  const date = article.date || article.publishedAt || new Date().toISOString();\n\n  const text = (title + \" \" + snippet).toLowerCase();\n\n  // Rule-based sentiment: check negative first, then positive\n  let sentiment = \"neutral\";\n  if (negative.some(w => text.includes(w))) {\n    sentiment = \"negative\";\n  } else if (positive.some(w => text.includes(w))) {\n    sentiment = \"positive\";\n  }\n\n  return {\n    json: {\n      title,\n      snippet,\n      link,\n      date,\n      text,\n      sentiment\n    }\n  };\n});\n\nreturn output;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        160,
+        -112
+      ],
+      "id": "885b5d34-b5fc-4bc5-a9df-184971d050ec",
+      "name": "Feedback Classifier"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.sentiment }}",
+                    "rightValue": "negative",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "9d88866a-7ff1-44a9-9cc3-564abfe91b39"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Telegram"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "839f317d-ca17-47f0-bbe9-07e9c013c0e0",
+                    "leftValue": "={{ $json.sentiment }}",
+                    "rightValue": "positive",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Airtable"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        384,
+        -16
+      ],
+      "id": "90a49195-0fdc-4d84-a613-a68727dc10d0",
+      "name": "Route by Feedback"
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request for Google News (AI/Microsoft)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request for Google News (AI/Microsoft)": {
+      "main": [
+        [
+          {
+            "node": "Feedback Classifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Feedback Classifier": {
+      "main": [
+        [
+          {
+            "node": "Log All to Google Sheets",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Route by Feedback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Feedback": {
+      "main": [
+        [
+          {
+            "node": "Send Negative Alert to Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Positive Alert to Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "bc7f481c-1fa7-436f-a913-acfb77bdff55",
+  "triggerCount": 1,
+  "tags": [],
+  "parentFolder": null,
+  "homeProject": {
+    "id": "iSNLc581x1E9UIsq",
+    "type": "personal",
+    "name": "Celestina   <celestinachukwu@gmail.com>",
+    "icon": null
+  },
+  "sharedWithProjects": [],
+  "usedCredentials": [
+    {
+      "id": "LGoKG13WSEEjRdKB",
+      "name": "Telegram account 2",
+      "type": "telegramApi",
+      "currentUserHasAccess": true,
+      "homeProject": {
+        "id": "iSNLc581x1E9UIsq",
+        "type": "personal",
+        "name": "Celestina   <celestinachukwu@gmail.com>",
+        "icon": null
+      },
+      "sharedWithProjects": []
+    },
+    {
+      "id": "Wa0ELh4ZHJnrEJAn",
+      "name": "Google Sheets account",
+      "type": "googleSheetsOAuth2Api",
+      "currentUserHasAccess": true,
+      "homeProject": {
+        "id": "iSNLc581x1E9UIsq",
+        "type": "personal",
+        "name": "Celestina   <celestinachukwu@gmail.com>",
+        "icon": null
+      },
+      "sharedWithProjects": []
+    },
+    {
+      "id": "o3wumYS0gecx1ZxQ",
+      "name": "Airtable Personal Access Token account",
+      "type": "airtableTokenApi",
+      "currentUserHasAccess": true,
+      "homeProject": {
+        "id": "iSNLc581x1E9UIsq",
+        "type": "personal",
+        "name": "Celestina   <celestinachukwu@gmail.com>",
+        "icon": null
+      },
+      "sharedWithProjects": []
+    }
+  ],
+  "scopes": [
+    "workflow:create",
+    "workflow:delete",
+    "workflow:execute",
+    "workflow:list",
+    "workflow:move",
+    "workflow:read",
+    "workflow:share",
+    "workflow:update"
+  ]
+}
